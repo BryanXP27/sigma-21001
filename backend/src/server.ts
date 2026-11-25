@@ -21,8 +21,8 @@ app.use(errorHandler);
 validateAuthConfiguration();
 void applyRuntimeMigrations()
   .then(() => {
-    app.listen(port, "127.0.0.1", () => {
-      console.log(`SIGMA 21001 API disponible en http://localhost:${port}`);
+    app.listen(port, "0.0.0.0", () => {
+      console.log(`SIGMA 21001 API disponible en http://0.0.0.0:${port}`);
     });
   })
   .catch((error: unknown) => {
