@@ -1,0 +1,173 @@
+---
+title: SIGMA 21001 - Modelo entidad relación de la base de datos
+---
+erDiagram
+    direction LR
+
+    ACADEMIC_YEARS ||--o{ SECTIONS : contiene
+    ACADEMIC_YEARS ||--o{ ACADEMIC_TERMS : contiene
+    SECTIONS ||--o{ ENROLLMENTS : agrupa
+    STUDENTS ||--o{ ENROLLMENTS : se_matricula
+    SECTIONS ||--o{ ATTENDANCE_SESSIONS : programa
+    SCHOOL_CALENDAR |o--o{ ATTENDANCE_SESSIONS : habilita
+    ATTENDANCE_SESSIONS ||--o{ STUDENT_ATTENDANCE : incluye
+    STUDENTS ||--o{ STUDENT_ATTENDANCE : registra
+    USERS ||--o{ STUDENT_ATTENDANCE : captura
+    STUDENTS ||--o{ GUARDIANS : contacto
+    USERS |o--o{ GUARDIANS : portal_familiar
+    PERSONNEL ||--o{ STAFF_LOGS : marca
+    STUDENTS ||--o{ ALERTS : recibe
+    STUDENT_ATTENDANCE |o--o{ ALERTS : origina
+    STUDENTS ||--o{ FUTS : justifica
+    USERS ||--o{ AUDIT_LOG : registra
+    SECTIONS |o--o{ REPORT_ARCHIVES : filtra
+    USERS ||--o{ REPORT_ARCHIVES : genera
+    SECTIONS ||--o| CLOSED_SESSIONS : archiva
+
+    ACADEMIC_YEARS {
+        int id PK
+        date starts_on
+        date ends_on
+    }
+    SECTIONS {
+        text id PK
+        int academic_year_id FK
+        string level
+        int grade
+        string label
+        string shift
+        string tutor
+    }
+    STUDENTS {
+        varchar siagie_code PK
+        string given_names
+        string family_names
+        string doc
+        string sex
+        date birth
+        boolean active
+        int qr
+    }
+    ENROLLMENTS {
+        uuid id PK
+        varchar student_id FK
+        text section_id FK
+        date starts_on
+        date ends_on
+        string status
+    }
+    USERS {
+        uuid id PK
+        string username UK
+        string password_hash
+        string full_name
+        string role
+        boolean active
+    }
+    PERSONNEL {
+        text id PK
+        string name
+        string role
+        string shift
+        string contact
+        string doc
+        boolean active
+        int qr
+    }
+    GUARDIANS {
+        uuid id PK
+        uuid user_id FK
+        varchar student_id FK
+        string name
+        string doc
+        string phone
+        string relation
+        string email
+    }
+    ATTENDANCE_SESSIONS {
+        uuid id PK
+        text section_id FK
+        date school_date
+        string status
+        timestamptz opened_at
+        string opened_by
+        timestamptz closed_at
+        string closed_by
+    }
+    STUDENT_ATTENDANCE {
+        uuid id PK
+        uuid session_id FK
+        varchar student_id FK
+        string status
+        string source
+        timestamptz recorded_at
+        timestamptz received_at
+        string recorded_by
+        uuid client_event_id UK
+        string reason
+        string corrected_by
+        timestamptz corrected_at
+    }
+    STAFF_LOGS {
+        uuid id PK
+        text personnel_id FK
+        date log_date
+        timestamptz in_time
+        timestamptz out_time
+        string source
+    }
+    ALERTS {
+        uuid id PK
+        varchar student_id FK
+        date alert_date
+        string kind
+        string status
+        int count
+    }
+    FUTS {
+        uuid id PK
+        varchar student_id FK
+        date fut_date
+        string ref
+        string reason
+        string status
+    }
+    SCHOOL_CALENDAR {
+        date school_date PK
+        boolean lective
+        string reason
+    }
+    ACADEMIC_TERMS {
+        int id PK
+        int academic_year_id FK
+        date starts_on
+        date ends_on
+    }
+    SYSTEM_CONFIG {
+        string key PK
+        string value
+        timestamptz updated_at
+    }
+    AUDIT_LOG {
+        uuid id PK
+        timestamptz at
+        string by_user
+        string event
+    }
+    REPORT_ARCHIVES {
+        uuid id PK
+        string title
+        string kind
+        date from_date
+        date to_date
+        string generated_by
+        string role
+        text section_id FK
+        jsonb headers
+        jsonb rows
+    }
+    CLOSED_SESSIONS {
+        text section_id FK
+        date school_date
+        timestamptz closed_at
+    }
